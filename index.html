@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>JSDoc: Home</title>
+  </head>
+
+  <body>
+
+  </body>
+  <script>
+   window.crypto.subtle.importKey(
+     "jwk",
+     { //this is an example jwk key, other key types are Uint8Array objects
+       kty: "RSA",
+       e: "AQAB",
+       n: "vGO3eU16ag9zRkJ4AK8ZUZrjbtp5xWK0LyFMNT8933evJoHeczexMUzSiXaLrEFSyQZor
+tk81zJH3y41MBO_UFDO_X0crAquNrkjZDrf9Scc5‐MdxlWU2Jl7Gc4Z18AC9aNibWVmXhgvHYkEo
+FdLCFG‐
+alg: "RSA-OAEP-256",
+ext: true
+},
+{ //these are the algorithm options
+name: "RSA-OAEP",
+hash: {name: "SHA-256"}
+},
+false, // key is not extractable
+["encrypt"] // key usage
+   )
+         .then(function(publicKey){
+           //returns a publicKey (or privateKey if you are importing a private key)
+           console.log(publicKey);
+         })
+         .catch(function(err){
+           console.error(err);
+         });
+  </script>
+</html>

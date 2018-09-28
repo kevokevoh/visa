@@ -1,0 +1,89 @@
+Endpoints that I am hitting (USING NODEJS)
+
+1. Secure Acceptance Flexible Token API (https://developer.visa.com/capabilities/cybersource/reference#cybersource__cybersource_flex_api)
+
+<--------------------------------- Generate Key --> This Works --------------------------------->
+
+url: 'https://sandbox.api.visa.com/cybersource/payments/flex/v1/keys?apikey=MY_API_KEY'
+
+X-PAY GENERATED TOKEN USING
+	resourcePath = 'payments/flex/v1/keys';
+	timestamp = Math.floor(Date.now() / 1000)
+	URI = {apikey: 'MY_API_KEY' }
+	messageBody = { encryptionType: 'RsaOaep256' }
+
+FUNCTION
+
+const crypto = require('crypto');
+
+function generateXPayToken(timestamp, resourcePath, queryParams, postBody, sharedSecret) {
+	const message = timestamp + resourcePath + queryParams + postBody;
+	const hashString = crypto.createHmac('SHA256', sharedSecret).update(message).digest('hex');
+	return `xv2:${timestamp}:${hashString}`;
+}
+
+RESPONSE (200 OK)
+SAMPLE RESPONSE
+{ keyId: '083UGS5mzqQFabIcW2M1m6WvsLwH2olP',
+  der: 
+   { format: 'X.509',
+     algorithm: 'RSA',
+     publicKey: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyfYNHCvjDjqI5vkJb1nSUGYs/h7cSOlvjk7QQEWPPQKi3u8/CLYmaGQCX4pByWqeNtsIoeRuRLpYFgXveQSaCElj51UB4CQI15yu6MuoX6Qx/o8q9l5o8XDqAX0UL3WbxXcrjQ3jp28A9F5fBR6PXACQy0ws3tdFLjJWL7e9y2YNtdFZrs1dCJjxesi7kSv668PgKePkQgy5pjRiC2Q5hYvmQWVZW5e8+r+j5UaHU/2mBoQ6FufJbwNDQi0cP5Z95xOk9oQjBM2Cmvmu2FoGPUYylkSYGf/lN39tzlaFxbGxGudMItYRiND/zz/y3kOJuJJ4ATFCOoU8kjiMmIQMxQIDAQAB' },
+  jwk: 
+   { kty: 'RSA',
+     use: 'enc',
+     kid: '083UGS5mzqQFabIcW2M1m6WvsLwH2olP',
+     n: 'yfYNHCvjDjqI5vkJb1nSUGYs_h7cSOlvjk7QQEWPPQKi3u8_CLYmaGQCX4pByWqeNtsIoeRuRLpYFgXveQSaCElj51UB4CQI15yu6MuoX6Qx_o8q9l5o8XDqAX0UL3WbxXcrjQ3jp28A9F5fBR6PXACQy0ws3tdFLjJWL7e9y2YNtdFZrs1dCJjxesi7kSv668PgKePkQgy5pjRiC2Q5hYvmQWVZW5e8-r-j5UaHU_2mBoQ6FufJbwNDQi0cP5Z95xOk9oQjBM2Cmvmu2FoGPUYylkSYGf_lN39tzlaFxbGxGudMItYRiND_zz_y3kOJuJJ4ATFCOoU8kjiMmIQMxQ',
+     e: 'AQAB' } }
+
+
+
+
+<--------------------------------- Tokenize Card --> Returns 400 (What's the Issue Here?) --------------------------------->
+
+url: 'https://sandbox.api.visa.com/cybersource/payments/flex/v1/tokens?apikey=MY_API_KEY'
+
+PAYLOAD:
+
+{
+"keyId": "083UGS5mzqQFabIcW2M1m6WvsLwH2olP",
+"cardDetails": {
+"cardNumber": "ejbhIpMEgYnIODcB4//rrVxMHrqHcnLD6pDRF36jlEk72bETAfiOoxmpI9pGiidqMmkgAnvJfVgR3CLAV5EdG4Mu5IWK26QRnVtwvsVEUtpah7IylbxV9MLvXh2FjIJskKCWNLidb1G4PN5963hnV3IoZd2pF99JwV9lPhOHT5ymlNeg7sTzQQDN1I0/yJApds+t79hl9QVp4PusUDfSsPQTtR2frzlH4V3W+XjHDhmy5oNhiUaVxv27cyG1SWeCKkVC9tc8zLy4pvlgoplrLV8JRaS9hfWalJjv2xtk3DXmNT2urtFv2evcI3LM/S29KlJjPXZcBp0IYyB/taunCA==",
+"cardType": "001",
+"cardExpirationYear": "2031",
+
+}
+RESPONSE 400
+
+{ responseStatus: 
+   { status: 400,
+     reason: 'JSON_PARSER_ERROR',
+     message: 'JSON parsing error - UnrecognizedPropertyException',
+     correlationId: null,
+     details: 
+      [ { location: 'Line [1], column [60]',
+          message: 'Error mapping JSON to field [cardDetails]' },
+        [length]: 1 ],
+     _embedded: {} },
+  _links: 
+   { self: null,
+     documentation: [ [length]: 0 ],
+     next: [ [length]: 0 ] } }
+
+<--------------------------------- Cybersource Payment --> Returns 404 (What's the Issue Here?) --------------------------------->
+
+2. Cybersource Payments REST API (https://developer.visa.com/capabilities/cybersource/reference)
+
+url: 'https://sandbox.api.visa.com/cybersource/v2/payments?apikey={apikey}'
+
+PAYLOAD: (Similar to what is in the docs)
+
+X-PAY GENERATED TOKEN USING
+	resourcePath = 'v2/payments';
+	timestamp = Math.floor(Date.now() / 1000)
+	URI = {apikey: 'MY_API_KEY' }
+	messageBody = PAYLOAD
+
+RESPONSE (404)
+
+Resource not found

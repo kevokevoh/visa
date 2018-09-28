@@ -1,0 +1,44 @@
+/* Copyright (c) 2018 by CyberSource */
+
+const qs = require('qs');
+const endpoints = require('./endpoints');
+
+const defaults = {
+  // credentials
+  mid: null,
+  keyId: null,
+  apikey: null,
+  sharedSecret: null,
+
+  // env
+  production: false,
+  proxy: null,
+};
+Object.freeze(defaults);
+
+function stripUnsupportedParams(params = {}) {
+  return Object.keys(params).reduce((acc, val) => {
+    if (val in defaults) acc[val] = params[val];
+    return acc;
+  }, {});
+}
+
+class Config {
+  constructor(params) {
+    Object.assign(this, defaults, stripUnsupportedParams(params));
+    Object.freeze(this);
+  }
+
+  isVDP() {
+    return this.apikey != null && this.sharedSecret != null;
+  }
+
+  getUrl() {
+    if (this.isVDP()) {
+      return `${this.production ? endpoints.VDP.PROD : endpoints.VDP.SANDBOX}?${qs.stringify({ apikey: this.apikey })}`;
+    }
+    return this.production ? endpoints.FLEX.PROD : endpoints.FLEX.CAS;
+  }
+}
+
+module.exports = Config;
