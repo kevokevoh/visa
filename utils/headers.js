@@ -10,7 +10,7 @@ function generateHeaders(config, messageBody) {
         resourcePath = 'payments/flex/v1/keys';
     }
     if (config.access === "card") {
-        resourcePath = 'v2/payments';
+        resourcePath = 'v2/payments?apikey=config.apikey';
     }
     if (config.access === "hello") {
         resourcePath = 'helloworld';
