@@ -1,5 +1,7 @@
 const visa = require('./initialiseVisa');
+const generateCardNumber = require('./utils/cardenc');
 const keys =require('./keys');
+var crypto = require('crypto');
 
 var token = visa({
     // auth credentials
@@ -10,12 +12,17 @@ var token = visa({
     access: "token"
 });
 
+const cardNumber = '4111111111111111';
+var hash = crypto.createHash('sha256').update(cardNumber).digest('hex');
+
+console.log(hash);
+
+
 var options = {
-    "keyId": "08jbVj4tbz3N9VVK30Qu7AshZyuDe3qe",
-    "cardDetails": {
-        "cardNumber": "ejbhIpMEgYnIODcB4//rrVxMHrqHcnLD6pDRF36jlEk72bETAfiOoxmpI9pGiidqMmkgAnvJfVgR3CLAV5EdG4Mu5IWK26QRnVtwvsVEUtpah7IylbxV9MLvXh2FjIJskKCWNLidb1G4PN5963hnV3IoZd2pF99JwV9lPhOHT5ymlNeg7sTzQQDN1I0/yJApds+t79hl9QVp4PusUDfSsPQTtR2frzlH4V3W+XjHDhmy5oNhiUaVxv27cyG1SWeCKkVC9tc8zLy4pvlgoplrLV8JRaS9hfWalJjv2xtk3DXmNT2urtFv2evcI3LM/S29KlJjPXZcBp0IYyB/taunCA==",
-        "cardType": "001",
-        "cardExpirationYear": "2031"
+    "keyId": "08DNdjgX7XdtyLip3g3ZAY2q0KxJnLPH",
+    "cardInfo": {
+        "cardNumber": hash,
+        "cardType": "001"
     }
 };
 token.tokenizeCard(options, function(err, resp, data) {

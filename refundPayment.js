@@ -3,7 +3,7 @@ const constants = require('./constants');
 const request = require('request');
 
 
-function processPayment(config, options, callback) {
+function refundPayment(config, options, callback) {
     const bodyJson = JSON.stringify(options);
     console.log(bodyJson);
     const body = options;
@@ -38,5 +38,5 @@ function processPayment(config, options, callback) {
     });
 }
 
-module.exports = processPayment;
+module.exports = refundPayment;
 
